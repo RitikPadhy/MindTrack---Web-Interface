@@ -6,13 +6,24 @@ import { getAuth } from "firebase-admin/auth";
 if (!getApps().length) {
   try {
     const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+    
+    // Check if the environment variable is set
+    if (!base64String) {
+      throw new Error("FIREBASE_ADMIN_CREDENTIAL_BASE64 environment variable is not set.");
+    }
+    
+    // Decode the Base64 string to a JSON string
     const serviceAccountJson = Buffer.from(base64String, 'base64').toString('utf8');
+    
+    // Parse the JSON string into a JavaScript object
     const serviceAccount = JSON.parse(serviceAccountJson);
+
     initializeApp({
       credential: cert(serviceAccount),
     });
   } catch (error) {
     console.error("Failed to initialize Firebase Admin SDK:", error);
+    throw new Error("Failed to initialize Firebase Admin SDK. Check your environment variables.");
   }
 }
 
