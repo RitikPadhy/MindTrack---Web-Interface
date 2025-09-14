@@ -61,9 +61,14 @@ const SignUpPage = () => {
 
       toast.success("Account created successfully. Please sign in.");
       router.push("/sign-in");
-    } catch (error: any) {
-      toast.error(`Signup failed: ${error.message}`);
-      console.error("Signup error:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(`Signup failed: ${error.message}`);
+        console.error("Signup error:", error);
+      } else {
+        toast.error("Signup failed: An unexpected error occurred.");
+        console.error("Signup error:", error);
+      }
     }
   };
 

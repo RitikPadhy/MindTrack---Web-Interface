@@ -1,7 +1,6 @@
 "use client"
 
-import { LayoutDashboard, AlertTriangle, Home, Repeat, ChevronUp, Infinity, Zap, ChevronDown, Package, Settings, Bug, Clock, PlayCircle, Upload, FileCheck2, User2, Activity, History, Brain, Cpu, Sparkles, Workflow, RefreshCcw, CheckCircle, Puzzle } from "lucide-react"
-import { useEffect, useState } from "react"
+import { LayoutDashboard, Home, ChevronUp, Zap, ChevronDown, Clock, User2, CheckCircle, Puzzle } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -15,11 +14,8 @@ import {
 } from "@/components/ui/sidebar"
 
 import React from "react";
-import { useRouter } from "next/navigation";
 
 import Link from "next/link"
-import { getApiBase } from "@/lib/apiBase";
-import { CommandLineIcon, CpuChipIcon, PuzzlePieceIcon, Squares2X2Icon } from "@heroicons/react/24/solid"
 
 const items = [
     {
@@ -60,7 +56,6 @@ const items = [
   }
 
 export function AppSidebar({ setShowSettings, userEmail }: AppSidebarProps) {
-  const router = useRouter();
   
 
   return (

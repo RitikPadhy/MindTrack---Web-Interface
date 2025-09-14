@@ -1,10 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function TestCyclesPage() {
-  const router = useRouter();
 
   // Redirect to home page on reload
   // useEffect(() => {

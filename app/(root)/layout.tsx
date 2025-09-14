@@ -1,5 +1,4 @@
 // (root)/layout.tsx
-import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css"; // Ensure this path is correct for your global styles

@@ -1,7 +1,13 @@
 // lib/apiBase.ts
+declare global {
+  interface Window {
+    __API_BASE__?: string;
+  }
+}
+
 export function getApiBase(): string {
   if (typeof window !== "undefined") {
-    return (window as any).__API_BASE__ || "";
+    return window.__API_BASE__ || "";
   }
-  return ""; // fallback for SSR (not used for your API calls)
+  return ""; // fallback for SSR
 }

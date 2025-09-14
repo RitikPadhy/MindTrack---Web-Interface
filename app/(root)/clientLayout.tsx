@@ -10,7 +10,6 @@ import PageDialog from "@/components/user-settings";
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
@@ -36,11 +35,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         const data = await response.json();
         sessionStorage.setItem('userDetails', JSON.stringify(data));
         setUserEmail(data.email);
-      } catch (err: any) {
-        console.error("Error fetching user:", err.message || "An unknown error occurred.");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Error fetching user:", err.message);
+        } else {
+          console.error("Error fetching user:", err);
+        }
         setUserEmail("Error");
-      } finally {
-        setLoadingUser(false);
       }
     };
 
@@ -57,7 +58,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
     if (storedEmail) {
       setUserEmail(storedEmail);
-      setLoadingUser(false);
     } else {
       fetchUser();
     }

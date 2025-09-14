@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from 'next/navigation';
 import { getApiBase } from "@/lib/apiBase";
-import { useState } from "react"
 
 import {
   Card,
@@ -71,11 +70,18 @@ const SignInPage = () => {
       setTimeout(() => {
         router.replace('/');
       }, 1000);
-    } catch (error: any) {
-      form.setError("root", {
-        type: "manual",
-        message: error.message || "Signin failed. Please try again.",
-      });
+    }  catch (error: unknown) {
+      if (error instanceof Error) {
+        form.setError("root", {
+          type: "manual",
+          message: error.message,
+        });
+      } else {
+        form.setError("root", {
+          type: "manual",
+          message: "Signin failed. Please try again.",
+        });
+      }
     }
   };
 
