@@ -1,3 +1,4 @@
+// lib/apiBase.ts
 export function getApiBase() {
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  return "/api"; // always proxy through Next.js
 }
