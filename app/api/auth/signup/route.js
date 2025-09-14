@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import admin from "firebase-admin";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
 
 // Initialize Firebase Admin only once
 if (!getApps().length) {
