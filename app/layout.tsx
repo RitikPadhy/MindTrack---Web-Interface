@@ -16,15 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.__API_BASE__ = location.hostname === "localhost"
-                ? "http://localhost:8000"
-                : "http://13.233.212.132";
-            `,
-          }}
-        />
         {children}
         <Toaster richColors position="top-right" />
       </body>
