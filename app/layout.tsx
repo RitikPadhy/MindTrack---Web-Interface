@@ -32,7 +32,7 @@ export default function RootLayout({
             __html: `
               window.__API_BASE__ = location.hostname === "localhost"
                 ? "http://localhost:8000"
-                : "https://testhive-dev-http.internal.cleartax.co";
+                : "http://13.233.212.132";
             `,
           }}
         />
