@@ -4,8 +4,9 @@ import { getAuth } from "firebase-admin/auth";
 
 // ✅ Initialize Firebase Admin only once
 if (!getApps().length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIAL);
-  serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+  const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+  const serviceAccountJson = Buffer.from(base64String, 'base64').toString('utf8');
+  const serviceAccount = JSON.parse(serviceAccountJson);
   initializeApp({
     credential: cert(serviceAccount),
   });
