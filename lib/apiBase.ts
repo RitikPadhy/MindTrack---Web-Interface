@@ -1,3 +1,7 @@
-export function getApiBase(): string {
-  return process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+export function getApiBase() {
+  if (process.env.NODE_ENV === "production") {
+    return ""; // relative path in production
+  } else {
+    return "http://localhost:8000"; // local backend
+  }
 }
