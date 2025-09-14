@@ -5,9 +5,16 @@ import { getFirestore } from "firebase-admin/firestore";
 
 // ✅ Initialize Firebase Admin only once
 if (!getApps().length) {
-  initializeApp({
-    credential: cert(JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIAL)),
-  });
+  try {
+    const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+    const serviceAccountJson = Buffer.from(base64String, 'base64').toString('utf8');
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    initializeApp({
+      credential: cert(serviceAccount),
+    });
+  } catch (error) {
+    console.error("Failed to initialize Firebase Admin SDK:", error);
+  }
 }
 
 const auth = getAuth();

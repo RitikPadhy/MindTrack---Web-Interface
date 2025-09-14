@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import admin from "firebase-admin";
 
 // Initialize Firebase Admin only once
-if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIAL || "{}");
-  
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+if (!getApps().length) {
+  try {
+    const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+    const serviceAccountJson = Buffer.from(base64String, 'base64').toString('utf8');
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    initializeApp({
+      credential: cert(serviceAccount),
+    });
+  } catch (error) {
+    console.error("Failed to initialize Firebase Admin SDK:", error);
+  }
 }
 
 const db = admin.firestore();
