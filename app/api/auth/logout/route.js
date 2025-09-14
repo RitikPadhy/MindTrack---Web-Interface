@@ -6,6 +6,14 @@ import { getAuth } from "firebase-admin/auth";
 if (!getApps().length) {
   try {
     const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+
+    // Log the value to the console during the build process
+    console.log("Base64 string from environment:", typeof base64String, base64String ? "Exists" : "Does not exist");
+
+    if (!base64String) {
+      throw new Error("Environment variable is not set.");
+    }
+    
     const serviceAccountJson = Buffer.from(base64String, 'base64').toString('utf8');
     const serviceAccount = JSON.parse(serviceAccountJson);
 
