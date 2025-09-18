@@ -65,7 +65,7 @@ export function AppSidebar({ setShowSettings, userEmail }: AppSidebarProps) {
           <SidebarGroup>
             <SidebarGroupLabel className="md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-semibold text-gray-700 tracking-wide mb-6 xl:mb-10 2xl:mb-14 mx-6 mt-6">
               <Link href="/" className="hover:opacity-80 transition-opacity">
-                TestHive
+                MindTrack
               </Link>
             </SidebarGroupLabel>
             <SidebarGroupContent>

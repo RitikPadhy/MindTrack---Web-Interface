@@ -84,7 +84,7 @@ const SignUpPage = () => {
       <Card className="relative z-20 w-full max-w-md lg:min-h-[250px] 2xl:min-h-[450px] bg-white backdrop-blur-xl border border-gray-300 shadow-xl rounded-2xl">
         <CardHeader>
           <CardTitle className="text-center text-primary-100 text-2xl">
-            TestHive
+            MindTrack
           </CardTitle>
           <CardDescription className="text-center text-light-100 text-sm">
             Register to explore your workspace

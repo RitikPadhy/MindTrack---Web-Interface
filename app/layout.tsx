@@ -4,7 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "TestHive",
+  title: "MindTrack",
   description: "Sidebar layout using ShadCN",
 };
 

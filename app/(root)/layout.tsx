@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TestHive",
+  title: "MindTrack",
   description: "Sidebar layout using ShadCN",
 };
 
