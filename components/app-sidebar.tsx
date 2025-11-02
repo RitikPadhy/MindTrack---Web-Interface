@@ -24,11 +24,6 @@ const items = [
       icon: Home,
     },
     {
-      title: "Schedule Tasks",
-      url: "scheduleTasks",
-      icon: Clock,
-    },
-    {
       title: "Track Progress",
       url: "trackProgress",
       icon: CheckCircle,
@@ -46,7 +41,7 @@ const items = [
     {
       title: "Reading Materials",
       url: "reading",
-      icon: LayoutDashboard,
+      icon: Clock,
     },
   ]
 
@@ -63,7 +58,7 @@ export function AppSidebar({ setShowSettings, userEmail }: AppSidebarProps) {
       <Sidebar className="border-none">
         <SidebarContent className="flex flex-col justify-between h-full overflow-y-auto scrollbar-hide">
           <SidebarGroup>
-            <SidebarGroupLabel className="md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-semibold text-gray-700 tracking-wide mb-6 xl:mb-10 2xl:mb-14 mx-6 mt-6">
+            <SidebarGroupLabel className="md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-4xl font-semibold text-gray-700 tracking-wide mb-6 xl:mb-10 2xl:mb-14 mx-6 mt-6">
               <Link href="/" className="hover:opacity-80 transition-opacity">
                 MindTrack
               </Link>
@@ -94,7 +89,7 @@ export function AppSidebar({ setShowSettings, userEmail }: AppSidebarProps) {
             >
               {/* Left section: icon + centered email */}
               <div className="flex items-center gap-4 flex-1">
-                <div className="rounded-lg bg-white p-2">
+                <div className="rounded-lg bg-white py-2 px-2">
                   <User2 className="h-5 w-5 text-gray-700" />
                 </div>
                 <div className="flex-1 flex justify-center">

@@ -167,7 +167,7 @@ const SignInPage = () => {
                 Welcome to <span className="text-user-primary">MindTrack</span>
               </h2>
               <p className="text-sm lg:text-base leading-snug max-w-md mx-auto text-light-100">
-                Empowering Therapists. Engaging Patients. Tracking Progress.
+                Tracking occupational engagement through our mobile app
               </p>
             </div>
           </div>
