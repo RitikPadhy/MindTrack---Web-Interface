@@ -35,7 +35,7 @@ export default function CreateUserDialog({
   const handleSubmit = async () => {
     try {
       const baseUrl = getApiBase();
-      const res = await fetch(`${baseUrl}/api/users/create-user`, {
+      const res = await fetch(`${baseUrl}/users/create-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
