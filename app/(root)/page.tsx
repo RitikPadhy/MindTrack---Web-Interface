@@ -95,7 +95,7 @@ export default function UserDashboardPage() {
       )}
 
       {/* Section Header */}
-      <div className="flex items-center mt-4 xl:mt-6 2xl:mt-10">
+      <div className="flex items-center mt-4 xl:mt-6 2xl:mt-6">
         <div>
           <span className="xl:text-[17px] 2xl:text-xl font-semibold text-gray-700">
             User Dashboard
