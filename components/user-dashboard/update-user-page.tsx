@@ -23,11 +23,7 @@ export default function UpdateUserDialog({
 
 
   const splitTasks = (value: string) => {
-    const tasks = value.split(",").map((t) => t.trim());
-    if (tasks.length !== 2) {
-      throw new Error("Please enter exactly two tasks separated by a comma.");
-    }
-    return tasks;
+    return value.split(",").map((t) => t.trim());
   };
 
   const handleChange = (index: number, value: string) => {
@@ -49,7 +45,8 @@ export default function UpdateUserDialog({
         body: JSON.stringify({
           uid: formData.uid,
           tasks: formData.tasks.reduce((acc: Record<number, { titles: string[] }>, task, idx) => {
-            if (task.titles.length > 0) acc[idx] = { titles: task.titles };
+            const splitTitles = task.titles.flatMap(title => splitTasks(title));
+            if (splitTitles.length > 0) acc[idx] = { titles: splitTitles };
             return acc;
           }, {} as Record<number, { titles: string[] }>),
         }),
