@@ -21,24 +21,26 @@ export default function UpdateUserDialog({
     tasks: Array.from({ length: 17 }, () => ({ titles: [] as string[] })),
   });
 
-  const handleChange = (index: number, value: string) => {
-    const updatedTasks = [...formData.tasks];
-    updatedTasks[index] = { titles: value.split(/,\s*/).map((t) => t.trim()) };
-    setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
+
+  const splitTasks = (value: string) => {
+    const tasks = value.split(",").map((t) => t.trim());
+    if (tasks.length !== 2) {
+      throw new Error("Please enter exactly two tasks separated by a comma.");
+    }
+    return tasks;
   };
 
-  const validateTasks = () => {
-    formData.tasks.forEach((task, idx) => {
-      task.titles.forEach((title) => {
-        if (!title.match(/^[a-zA-Z0-9 ]+$/)) {
-          console.error(`Task Slot ${idx + 1} contains invalid characters.`);
-        }
-      });
-    });
+  const handleChange = (index: number, value: string) => {
+    try {
+      const updatedTasks = [...formData.tasks];
+      updatedTasks[index] = { titles: splitTasks(value) };
+      setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
+    } catch (error) {
+      console.error((error as Error).message);
+    }
   };
 
   const handleSubmit = async () => {
-    validateTasks();
     try {
       const baseUrl = getApiBase();
       const res = await fetch(`${baseUrl}/users/update-activity`, {
