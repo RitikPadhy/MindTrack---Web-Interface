@@ -23,7 +23,7 @@ export default function UpdateUserDialog({
 
   const handleChange = (index: number, value: string) => {
     const updatedTasks = [...formData.tasks];
-    updatedTasks[index] = { titles: value.split(/,(?![^,]*,)/).map((t) => t.trim()).filter(Boolean) };
+    updatedTasks[index] = { titles: value.split(",").map((t) => t.trim()).filter(Boolean) };
     setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
   };
 
