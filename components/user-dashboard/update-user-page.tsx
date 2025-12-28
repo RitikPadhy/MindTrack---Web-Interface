@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ export default function UpdateUserDialog({
   const handleChange = (index: number, value: string) => {
     const updatedTasks = [...formData.tasks];
     updatedTasks[index] = { titles: value.split(";").map((t) => t.trim()).filter(Boolean) };
-    setFormData((prev) => ({ ...prev, tasks: updatedTasks }));
+    setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
   };
 
   const handleSubmit = async () => {
@@ -35,7 +35,7 @@ export default function UpdateUserDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uid: formData.uid,
-          tasks: formData.tasks.reduce((acc, task, idx) => {
+          tasks: formData.tasks.reduce((acc: Record<number, { titles: string[] }>, task, idx) => {
             if (task.titles.length > 0) acc[idx] = { titles: task.titles };
             return acc;
           }, {} as Record<number, { titles: string[] }>),
@@ -54,7 +54,7 @@ export default function UpdateUserDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur-[3px] flex justify-center items-center z-50">
+    <div className="fixed inset-0 backdrop-blur-[3px] flex justify-center items-center z-50" role="dialog">
       <Card className="w-full max-w-3xl bg-white rounded-xl shadow-xl">
         <CardHeader>
           <CardTitle className="text-[28px] font-bold text-gray-900 dark:text-white">
@@ -65,7 +65,7 @@ export default function UpdateUserDialog({
         {/* ✅ Increased horizontal padding (px-8) for left/right spacing */}
         <CardContent className="space-y-6 max-h-[65vh] overflow-y-auto px-8 pb-4">
           {/* User ID and Task 1 side by side */}
-          <div className="flex space-x-6">
+          <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-2 w-full">
                 <Label>User ID</Label>
                 {patientIds.length === 0 ? (
@@ -73,8 +73,8 @@ export default function UpdateUserDialog({
                 ) : (
                 <select
                     value={formData.uid}
-                    onChange={(e) => setFormData({ ...formData, uid: e.target.value })}
-                    className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, uid: e.target.value })}
+                    className="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 w-full"
                 >
                     <option value="">Select a User ID</option>
                     {patientIds.map((uid) => (
@@ -90,7 +90,7 @@ export default function UpdateUserDialog({
               <Label>Task Slot 1</Label>
               <Input
                 value={formData.tasks[0].titles.join(", ")}
-                onChange={(e) => handleChange(0, e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(0, e.target.value)}
                 placeholder="Enter tasks separated by commas, e.g., Task1, Task2"
                 title="You can enter multiple tasks separated by commas"
                 className="text-sm text-gray-700"
@@ -100,12 +100,12 @@ export default function UpdateUserDialog({
 
           {/* Remaining tasks */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {formData.tasks.slice(1).map((task, idx) => (
+            {formData.tasks.slice(1).map((task: { titles: string[] }, idx: number) => (
               <div key={idx + 1} className="flex flex-col space-y-2">
                 <Label>Task Slot {idx + 2}</Label>
                 <Input
                   value={task.titles.join(", ")}
-                  onChange={(e) => handleChange(idx + 1, e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(idx + 1, e.target.value)}
                   placeholder="Enter comma-separated task titles"
                   className="text-sm text-gray-700"
                 />
