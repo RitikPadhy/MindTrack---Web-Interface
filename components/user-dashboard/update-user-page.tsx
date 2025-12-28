@@ -18,7 +18,7 @@ export default function UpdateUserDialog({
 }) {
   const [formData, setFormData] = useState({
     uid: "",
-    tasks: Array.from({ length: 17 }, () => ({ titles: [] as string[] })),
+    tasks: Array.from({ length: 17 }, () => ({ titles: [] as string[], time: "" })),
   });
 
 
@@ -29,7 +29,7 @@ export default function UpdateUserDialog({
   const handleChange = (index: number, value: string) => {
     try {
       const updatedTasks = [...formData.tasks];
-      updatedTasks[index] = { titles: splitTasks(value) };
+      updatedTasks[index] = { ...updatedTasks[index], titles: splitTasks(value) };
       setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
     } catch (error) {
       console.error((error as Error).message);
@@ -44,11 +44,12 @@ export default function UpdateUserDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           uid: formData.uid,
-          tasks: formData.tasks.reduce((acc: Record<number, { titles: string[] }>, task, idx) => {
+          tasks: formData.tasks.reduce((acc: Record<number, { titles: string[], time: string }>, task, idx) => {
             const splitTitles = task.titles.flatMap(title => splitTasks(title));
-            if (splitTitles.length > 0) acc[idx] = { titles: splitTitles };
+            acc[idx] = { titles: splitTitles, time: task.time };
+            if (splitTitles.length > 0) acc[idx] = { titles: splitTitles, time: task.time };
             return acc;
-          }, {} as Record<number, { titles: string[] }>),
+          }, {} as Record<number, { titles: string[], time: string }>),
         }),
       });
 
@@ -114,11 +115,22 @@ export default function UpdateUserDialog({
             {formData.tasks.slice(1).map((task: { titles: string[] }, idx: number) => (
               <div key={idx + 1} className="flex flex-col space-y-2">
                 <Label>Task Slot {idx + 2}</Label>
-                <Input
+                <div className="flex space-x-2">
+                  <Input
                   value={task.titles.join(", ")}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(idx + 1, e.target.value)}
                   placeholder="Enter comma-separated task titles"
                   className="text-sm text-gray-700"
+                />
+                <Input
+                  value={task.time}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const updatedTasks = [...formData.tasks];
+                    updatedTasks[idx + 1].time = e.target.value;
+                    setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
+                  }}
+                  placeholder="e.g., 10AM-11AM"
+                  className="text-sm text-gray-700 w-32"
                 />
               </div>
             ))}
