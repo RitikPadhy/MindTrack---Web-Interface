@@ -112,26 +112,29 @@ export default function UpdateUserDialog({
 
           {/* Remaining tasks */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {formData.tasks.slice(1).map((task: { titles: string[] }, idx: number) => (
+            {formData.tasks.slice(1).map((task: { titles: string[]; time: string }, idx: number) => (
               <div key={idx + 1} className="flex flex-col space-y-2">
                 <Label>Task Slot {idx + 2} (e.g., 10AM-11AM)</Label>
                 <div className="flex space-x-2">
                   <Input
-                  value={task.titles.join(", ")}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(idx + 1, e.target.value)}
-                  placeholder="Enter comma-separated task titles"
-                  className="text-sm text-gray-700"
-                />
-                <Input
-                  value={task.time}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const updatedTasks = [...formData.tasks];
-                    updatedTasks[idx + 1].time = e.target.value;
-                    setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
-                  }}
-                  placeholder="e.g., 10AM-11AM"
-                  className="text-sm text-gray-700 w-32"
-                />
+                    value={task.titles.join(", ")}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleChange(idx + 1, e.target.value)
+                    }
+                    placeholder="Enter comma-separated task titles"
+                    className="text-sm text-gray-700"
+                  />
+                  <Input
+                    value={task.time}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const updatedTasks = [...formData.tasks];
+                      updatedTasks[idx + 1].time = e.target.value;
+                      setFormData((prev) => ({ ...prev, tasks: updatedTasks }));
+                    }}
+                    placeholder="e.g., 10AM-11AM"
+                    className="text-sm text-gray-700 w-32"
+                  />
+                </div>
               </div>
             ))}
           </div>
