@@ -115,26 +115,14 @@ export default function UpdateUserDialog({
             {formData.tasks.slice(1).map((task: { titles: string[]; time: string }, idx: number) => (
               <div key={idx + 1} className="flex flex-col space-y-2">
                 <Label>Task Slot {idx + 2} ({['7AM-8AM', '8AM-9AM', '9AM-10AM', '10AM-11AM', '11AM-12PM', '12PM-1PM', '1PM-2PM', '2PM-3PM', '3PM-4PM', '4PM-5PM', '5PM-6PM', '6PM-7PM', '7PM-8PM', '8PM-9PM', '9PM-10PM', '10PM-11PM'][idx]})</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    value={task.titles.join(", ")}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleChange(idx + 1, e.target.value)
-                    }
-                    placeholder="Enter tasks"
-                    className="text-sm text-gray-700"
-                  />
-                  <Input
-                    value={task.time}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const updatedTasks = [...formData.tasks];
-                      updatedTasks[idx + 1].time = e.target.value;
-                      setFormData((prev) => ({ ...prev, tasks: updatedTasks }));
-                    }}
-                    placeholder="e.g., 10AM-11AM"
-                    className="text-sm text-gray-700 w-32"
-                  />
-                </div>
+                <Input
+                  value={task.titles.join(", ")}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleChange(idx + 1, e.target.value)
+                  }
+                  placeholder="Enter tasks"
+                  className="text-sm text-gray-700"
+                />
               </div>
             ))}
           </div>
