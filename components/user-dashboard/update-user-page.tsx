@@ -121,7 +121,7 @@ export default function UpdateUserDialog({
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       handleChange(idx + 1, e.target.value)
                     }
-                    placeholder="Enter comma-separated task titles"
+                    placeholder="Enter tasks"
                     className="text-sm text-gray-700"
                   />
                   <Input
