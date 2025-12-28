@@ -99,7 +99,7 @@ export default function UpdateUserDialog({
             </div>
 
             <div className="flex flex-col space-y-2 w-full">
-              <Label>Task Slot 1 (e.g., 10AM-11AM)</Label>
+              <Label>Task Slot 1 (6AM-7AM)</Label>
               <Input
                 value={formData.tasks[0].titles.join(", ")}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(0, e.target.value)}
@@ -114,7 +114,7 @@ export default function UpdateUserDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {formData.tasks.slice(1).map((task: { titles: string[]; time: string }, idx: number) => (
               <div key={idx + 1} className="flex flex-col space-y-2">
-                <Label>Task Slot {idx + 2} (e.g., 10AM-11AM)</Label>
+                <Label>Task Slot {idx + 2} ({['7AM-8AM', '8AM-9AM', '9AM-10AM', '10AM-11AM', '11AM-12PM', '12PM-1PM', '1PM-2PM', '2PM-3PM', '3PM-4PM', '4PM-5PM', '5PM-6PM', '6PM-7PM', '7PM-8PM', '8PM-9PM', '9PM-10PM', '10PM-11PM'][idx]})</Label>
                 <div className="flex space-x-2">
                   <Input
                     value={task.titles.join(", ")}
