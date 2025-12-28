@@ -23,11 +23,22 @@ export default function UpdateUserDialog({
 
   const handleChange = (index: number, value: string) => {
     const updatedTasks = [...formData.tasks];
-    updatedTasks[index] = { titles: value.split(",").map((t) => t.trim()).filter(Boolean) };
+    updatedTasks[index] = { titles: value.split(",").map((t) => t.trim()) };
     setFormData((prev: typeof formData) => ({ ...prev, tasks: updatedTasks }));
   };
 
+  const validateTasks = () => {
+    formData.tasks.forEach((task, idx) => {
+      task.titles.forEach((title) => {
+        if (!title.match(/^[a-zA-Z0-9 ]+$/)) {
+          console.error(`Task Slot ${idx + 1} contains invalid characters.`);
+        }
+      });
+    });
+  };
+
   const handleSubmit = async () => {
+    validateTasks();
     try {
       const baseUrl = getApiBase();
       const res = await fetch(`${baseUrl}/users/update-activity`, {
@@ -49,6 +60,7 @@ export default function UpdateUserDialog({
     } catch (err) {
       console.error("Error updating user:", err);
     }
+
   };
 
   if (!open) return null;
