@@ -23,7 +23,7 @@ export default function UpdateUserDialog({
 
   const handleChange = (index: number, value: string) => {
     const updatedTasks = [...formData.tasks];
-    updatedTasks[index] = { titles: value.split(",").map((t) => t.trim()).filter(Boolean) };
+    updatedTasks[index] = { titles: value.split(";").map((t) => t.trim()).filter(Boolean) };
     setFormData((prev) => ({ ...prev, tasks: updatedTasks }));
   };
 
@@ -91,7 +91,8 @@ export default function UpdateUserDialog({
               <Input
                 value={formData.tasks[0].titles.join(", ")}
                 onChange={(e) => handleChange(0, e.target.value)}
-                placeholder="Enter comma-separated task titles"
+                placeholder="Enter tasks separated by commas, e.g., Task1, Task2"
+                title="You can enter multiple tasks separated by commas"
                 className="text-sm text-gray-700"
               />
             </div>
