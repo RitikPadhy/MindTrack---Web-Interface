@@ -22,17 +22,30 @@ export default function UserDetailsPage({
 }) {
   if (!open) return null;
 
-  // ✅ Pie Chart Data (Task Distribution)
-  const taskData = [
-    { name: "Eating", value: 40 },
-    { name: "Playing", value: 20 },
-    { name: "Reading", value: 25 },
-    { name: "Sleeping", value: 15 },
+  /* -------------------------------------------------------
+     ✅ STATIC CATEGORY DISTRIBUTION (ALL 6)
+  ------------------------------------------------------- */
+  const categoryData = [
+    { name: "Care of Self", value: 20 },
+    { name: "Care of Others / Home", value: 18 },
+    { name: "Work or Education", value: 22 },
+    { name: "Leisure", value: 15 },
+    { name: "Rest or Sleep", value: 15 },
+    { name: "Social Participation", value: 10 },
   ];
 
-  const COLORS = ["#4ade80", "#60a5fa", "#facc15", "#f87171"];
+  const COLORS = [
+    "#4ade80", // green
+    "#60a5fa", // blue
+    "#facc15", // yellow
+    "#fb7185", // pink
+    "#a78bfa", // purple
+    "#38bdf8", // sky
+  ];
 
-  // ✅ Custom label inside pie slices
+  /* -------------------------------------------------------
+     ✅ Custom pie label
+  ------------------------------------------------------- */
   const renderCustomizedLabel = ({
     cx,
     cy,
@@ -61,7 +74,9 @@ export default function UserDetailsPage({
     );
   };
 
-  // ✅ Table Data (Week-wise overview)
+  /* -------------------------------------------------------
+     ✅ Static weekly summary
+  ------------------------------------------------------- */
   const weekData = [
     { week: "Week 1", timeSpent: "12 hrs", daysActive: 5, tasksDone: 4 },
     { week: "Week 2", timeSpent: "10 hrs", daysActive: 4, tasksDone: 3 },
@@ -79,87 +94,73 @@ export default function UserDetailsPage({
         </CardHeader>
 
         <CardContent>
-          {/* --- Flex layout for Pie + Table side-by-side --- */}
           <div className="flex flex-col lg:flex-row gap-8">
-            
-            {/* --- Pie Chart Box --- */}
+            {/* ---------------- Pie Chart ---------------- */}
             <Card className="flex-1 p-4 shadow-md border border-gray-200">
               <CardHeader>
                 <h3 className="text-lg font-semibold text-gray-700 text-center">
-                  Tasks Distribution
+                  Activity Category Distribution
                 </h3>
               </CardHeader>
+
               <CardContent className="flex justify-center items-center h-80">
-                <ResponsiveContainer width="90%" height="100%">
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={taskData}
+                      data={categoryData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={120}
                       innerRadius={60}
+                      outerRadius={120}
                       paddingAngle={3}
                       dataKey="value"
                       labelLine={false}
                       label={renderCustomizedLabel}
                     >
-                      {taskData.map((entry, index) => (
+                      {categoryData.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
-                          className="transition-transform duration-300 hover:scale-105"
                         />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "8px",
-                        fontSize: "13px",
-                        color: "#1e293b",
-                      }}
-                    />
+
+                    <Tooltip />
                     <Legend
                       verticalAlign="bottom"
-                      height={36}
+                      height={48}
                       iconType="circle"
-                      wrapperStyle={{
-                        fontSize: "13px",
-                        color: "#334155",
-                      }}
+                      wrapperStyle={{ fontSize: "13px" }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            {/* --- Table Box --- */}
+            {/* ---------------- Weekly Table ---------------- */}
             <Card className="flex-1 p-4 shadow-md border border-gray-200">
               <CardHeader>
                 <h3 className="text-lg font-semibold text-gray-700 text-center">
                   Weekly Activity Summary
                 </h3>
               </CardHeader>
+
               <CardContent>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
-                  <table className="min-w-full text-sm border-collapse text-center">
-                    <thead className="bg-gray-100 text-gray-700 font-medium">
+                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                  <table className="min-w-full text-sm text-center">
+                    <thead className="bg-gray-100 text-gray-700">
                       <tr>
                         <th className="px-3 py-3 border-b">Week</th>
-                        <th className="px-3 py-3 border-b">Total Time Spent</th>
+                        <th className="px-3 py-3 border-b">Time Spent</th>
                         <th className="px-3 py-3 border-b">Days Active</th>
                         <th className="px-3 py-3 border-b">
-                          Varieties of Tasks Done
+                          Task Varieties
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {weekData.map((row, i) => (
-                        <tr
-                          key={i}
-                          className="hover:bg-gray-50 even:bg-gray-50 transition"
-                        >
+                        <tr key={i} className="even:bg-gray-50">
                           <td className="px-3 py-2 border-b">{row.week}</td>
                           <td className="px-3 py-2 border-b">{row.timeSpent}</td>
                           <td className="px-3 py-2 border-b">{row.daysActive}</td>
