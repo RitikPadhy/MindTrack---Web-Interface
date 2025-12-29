@@ -72,6 +72,14 @@ export default function UpdateUserDialog({
     });
   };
 
+  const removeTaskRow = (slotIndex: number) => {
+    setTasks((prev) => {
+      const copy = [...prev];
+      copy[slotIndex] = [copy[slotIndex][0]]; // keep only first task
+      return copy;
+    });
+  };
+
   const handleSubmit = async () => {
     try {
       const payload: Record<number, TaskItem[]> = {};
@@ -85,17 +93,14 @@ export default function UpdateUserDialog({
         }
       });
 
-      const res = await fetch(
-        `${getApiBase()}/api/users/update-tasks`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uid,
-            tasks: payload,
-          }),
-        }
-      );
+      const res = await fetch(`${getApiBase()}/users/update-tasks`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid,
+          tasks: payload,
+        }),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to update tasks");
@@ -144,7 +149,7 @@ export default function UpdateUserDialog({
               <Label>Task Slot {slotIdx + 1}</Label>
 
               {slot.map((task, taskIdx) => (
-                <div key={taskIdx} className="flex gap-2">
+                <div key={taskIdx} className="flex gap-2 items-center">
                   <select
                     value={task.category}
                     onChange={(e) =>
@@ -178,12 +183,23 @@ export default function UpdateUserDialog({
                     placeholder="Enter task"
                   />
 
-                  {taskIdx === 0 && slot.length < 2 && (
+                  {/* + Button */}
+                  {taskIdx === 0 && slot.length === 1 && (
                     <Button
                       variant="outline"
                       onClick={() => addTaskRow(slotIdx)}
                     >
                       +
+                    </Button>
+                  )}
+
+                  {/* − Button */}
+                  {taskIdx === 1 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => removeTaskRow(slotIdx)}
+                    >
+                      −
                     </Button>
                   )}
                 </div>
