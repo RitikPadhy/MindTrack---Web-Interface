@@ -86,7 +86,7 @@ export default function UpdateUserDialog({
       });
 
       const res = await fetch(
-        `${getApiBase()}/api/users/update-tasks`,
+        `${getApiBase()}/users/update-tasks`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
