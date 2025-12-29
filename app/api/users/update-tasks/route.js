@@ -6,8 +6,17 @@ import { getFirestore } from "firebase-admin/firestore";
 if (!getApps().length) {
   try {
     const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
-    const serviceAccountJson = Buffer.from(base64String, "base64").toString("utf8");
+    if (!base64String) {
+      throw new Error("Missing FIREBASE_ADMIN_CREDENTIAL_BASE64");
+    }
+
+    const serviceAccountJson = Buffer.from(
+      base64String,
+      "base64"
+    ).toString("utf8");
+
     const serviceAccount = JSON.parse(serviceAccountJson);
+
     initializeApp({
       credential: cert(serviceAccount),
     });
@@ -22,7 +31,7 @@ export async function PATCH(req) {
   try {
     const { uid, tasks } = await req.json();
 
-    // ✅ Validate
+    // ✅ Validate request body
     if (!uid || !tasks || typeof tasks !== "object") {
       return NextResponse.json(
         { detail: "Missing or invalid fields: uid, tasks (object expected)" },
@@ -41,31 +50,43 @@ export async function PATCH(req) {
     }
 
     const routineData = docSnap.data();
-    const currentTasks = routineData.tasks || Array.from({ length: 17 }, () => ({ titles: [] }));
 
-    // ✅ Merge titles for each task slot (0–16)
+    // Ensure we always work with a 17-slot array
+    const currentTasks =
+      Array.isArray(routineData.tasks) && routineData.tasks.length === 17
+        ? routineData.tasks
+        : Array.from({ length: 17 }, () => ({ titles: [] }));
+
+    // ✅ REPLACE titles per slot (NOT merge)
     for (const [index, newTask] of Object.entries(tasks)) {
-      const idx = parseInt(index, 10);
-      if (idx >= 0 && idx < 17 && newTask?.titles?.length) {
-        // Ensure it's an array of strings
-        const newTitles = newTask.titles.filter(t => typeof t === "string" && t.trim() !== "");
-        if (newTitles.length > 0) {
-          const existingTitles = currentTasks[idx]?.titles || [];
-          // Merge & remove duplicates
-          const mergedTitles = Array.from(new Set([...existingTitles, ...newTitles]));
-          currentTasks[idx] = { titles: mergedTitles };
-        }
-      }
+      const idx = Number(index);
+
+      if (Number.isNaN(idx) || idx < 0 || idx >= 17) continue;
+
+      const cleanedTitles = Array.isArray(newTask?.titles)
+        ? newTask.titles
+            .filter((t) => typeof t === "string")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
+
+      // 🔁 Replace entire slot
+      currentTasks[idx] = {
+        titles: cleanedTitles,
+      };
     }
 
-    // ✅ Update in Firestore
+    // ✅ Persist update
     await docRef.update({
       tasks: currentTasks,
       updatedAt: new Date().toISOString(),
     });
 
     return NextResponse.json(
-      { message: "Tasks updated successfully", updatedSlots: Object.keys(tasks) },
+      {
+        message: "Tasks updated successfully",
+        updatedSlots: Object.keys(tasks),
+      },
       { status: 200 }
     );
   } catch (error) {
