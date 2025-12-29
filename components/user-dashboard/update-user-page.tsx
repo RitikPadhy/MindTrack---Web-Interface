@@ -73,7 +73,7 @@ export default function UpdateUserDialog({
         {} as Record<number, { titles: string[]; time: string }>
       );
 
-      const res = await fetch(`${baseUrl}/users/update-activity`, {
+      const res = await fetch(`${baseUrl}/users/update-tasks`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
