@@ -22,7 +22,6 @@ export default function CreateUserDialog({
 }) {
   const [formData, setFormData] = useState({
     uid: "",
-    password: "",
     name: "",
     gender: "",
     role: "Patient",
@@ -101,27 +100,12 @@ export default function CreateUserDialog({
             />
           </div>
 
-          {/* Password */}
-          <div className="flex flex-col space-y-2">
-            <Label>Password</Label>
-            <Input
-              type="password"
-              value={formData.password}
-              onChange={(e) =>
-                handleChange("password", e.target.value)
-              }
-              placeholder="Set password"
-            />
-          </div>
-
           {/* Gender */}
           <div className="flex flex-col space-y-2">
             <Label>Gender</Label>
             <select
               value={formData.gender}
-              onChange={(e) =>
-                handleChange("gender", e.target.value)
-              }
+              onChange={(e) => handleChange("gender", e.target.value)}
               className="border rounded-md px-3 py-2 w-full text-gray-600 text-sm focus:ring-2 focus:ring-gray-400 focus:outline-none"
             >
               <option value="">Select gender</option>
