@@ -3,42 +3,68 @@ import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
-// ✅ Initialize Firebase Admin only once
+/* ---------------------------------------------------
+   Firebase Admin Initialization (Singleton)
+--------------------------------------------------- */
 if (!getApps().length) {
   try {
-    const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
-    const serviceAccountJson = Buffer.from(base64String, "base64").toString("utf8");
+    const base64String =
+      process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+
+    if (!base64String) {
+      throw new Error("Missing FIREBASE_ADMIN_CREDENTIAL_BASE64");
+    }
+
+    const serviceAccountJson = Buffer.from(
+      base64String,
+      "base64"
+    ).toString("utf8");
+
     const serviceAccount = JSON.parse(serviceAccountJson);
+
     initializeApp({
       credential: cert(serviceAccount),
     });
   } catch (error) {
-    console.error("Failed to initialize Firebase Admin SDK:", error);
+    console.error(
+      "❌ Failed to initialize Firebase Admin SDK:",
+      error
+    );
   }
 }
 
 const auth = getAuth();
 const db = getFirestore();
 
-// ----------------- Helper: Generate 4-week Routine -----------------
+/* ---------------------------------------------------
+   Helper: Generate 4-Week Routine
+--------------------------------------------------- */
 function generateFourWeekRoutine(createdAt) {
   const routineData = {};
   const startDate = new Date(createdAt);
-  const hoursList = Array.from({ length: 17 }, (_, i) => `${(6 + i).toString().padStart(2, "0")}:00`);
+
+  // 06:00 → 22:00 (17 hours)
+  const hoursList = Array.from(
+    { length: 17 },
+    (_, i) => `${String(6 + i).padStart(2, "0")}:00`
+  );
 
   for (let dayOffset = 0; dayOffset < 28; dayOffset++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + dayOffset);
+
     const dateKey = currentDate.toISOString().split("T")[0];
     routineData[dateKey] = {};
 
     for (const hour of hoursList) {
       const slots = {};
+
       for (let i = 0; i < 60; i += 15) {
-        const [h, m] = hour.split(":").map(Number);
-        const slot = `${String(h).padStart(2, "0")}:${String(i).padStart(2, "0")}`;
+        const [h] = hour.split(":");
+        const slot = `${h}:${String(i).padStart(2, "0")}`;
         slots[slot] = { filled: false };
       }
+
       routineData[dateKey][hour] = { slots };
     }
   }
@@ -46,30 +72,40 @@ function generateFourWeekRoutine(createdAt) {
   return routineData;
 }
 
-// ----------------- Helper: Create Patient Routine -----------------
-async function createPatientRoutine(uid, email, role, createdAt) {
+/* ---------------------------------------------------
+   Helper: Create Patient Routine
+--------------------------------------------------- */
+async function createPatientRoutine(uid, role, createdAt) {
   const routineData = generateFourWeekRoutine(createdAt);
-  const tasksArray = Array.from({ length: 17 }, () => ({ tasks: [] }));
+
+  const tasksArray = Array.from(
+    { length: 17 },
+    () => ({ tasks: [] })
+  );
 
   const routineDoc = {
     uid,
-    email,
     role,
     createdAt,
     routines: routineData,
     tasks: tasksArray,
   };
 
-  await db.collection("daily_routines").doc(uid).set(routineDoc);
+  await db
+    .collection("daily_routines")
+    .doc(uid)
+    .set(routineDoc);
+
   console.log(`✅ Routine created for patient ${uid}`);
 }
 
-// ----------------- Main API: Create User -----------------
+/* ---------------------------------------------------
+   API: Create User (NO EMAIL)
+--------------------------------------------------- */
 export async function POST(req) {
   try {
     const {
       uid,
-      email,
       password,
       name,
       gender,
@@ -81,20 +117,25 @@ export async function POST(req) {
       status,
     } = await req.json();
 
-    // ✅ Validation
-    if (!uid || !email || !name) {
+    /* -------- Validation -------- */
+    if (!uid || !name) {
       return NextResponse.json(
-        { detail: "Missing required fields: uid, email, name" },
+        { detail: "Missing required fields: uid, name" },
         { status: 400 }
       );
     }
 
-    // ✅ Default values
+    /* -------- Defaults -------- */
     const userRole = role?.trim() || "Patient";
     const userPassword = password?.trim() || "Password123";
+    const createdAt = new Date().toISOString();
 
-    // ✅ Check if UID already exists in Firestore
-    const existing = await db.collection("users").doc(uid).get();
+    /* -------- Check Firestore -------- */
+    const existing = await db
+      .collection("users")
+      .doc(uid)
+      .get();
+
     if (existing.exists) {
       return NextResponse.json(
         { detail: `User with UID ${uid} already exists` },
@@ -102,47 +143,57 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Create Firebase user (use custom UID)
-    const userRecord = await auth.createUser({
+    /* -------- Create Firebase Auth User -------- */
+    await auth.createUser({
       uid,
-      email,
       password: userPassword,
       displayName: name,
     });
 
-    // ✅ Prepare Firestore user data
-    const createdAt = new Date().toISOString();
+    /* -------- Firestore User Data -------- */
     const userData = {
       uid,
-      email,
       name,
       gender: gender || "",
       role: userRole,
       diagnosis: diagnosis || "",
-      age: age || null,
+      age: age ?? null,
       startDate: startDate || createdAt,
       lastLogin: null,
-      weekNo: weekNo || 1,
+      weekNo: weekNo ?? 1,
       status: status || "Active",
       createdAt,
     };
 
-    // ✅ Add to Firestore
-    await db.collection("users").doc(uid).set(userData);
+    await db
+      .collection("users")
+      .doc(uid)
+      .set(userData);
 
-    // ✅ Automatically create routine if patient
+    /* -------- Auto Create Routine -------- */
     if (userRole.toLowerCase() === "patient") {
-      await createPatientRoutine(uid, email, userRole, createdAt);
+      await createPatientRoutine(
+        uid,
+        userRole,
+        createdAt
+      );
     }
 
     return NextResponse.json(
-      { message: "User created successfully", user: userData },
+      {
+        message: "User created successfully",
+        user: userData,
+      },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("❌ Error creating user:", error);
+
     return NextResponse.json(
-      { detail: error.message || "Internal server error" },
+      {
+        detail:
+          error.message || "Internal server error",
+      },
       { status: 500 }
     );
   }

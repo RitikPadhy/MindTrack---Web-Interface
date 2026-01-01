@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +22,6 @@ export default function CreateUserDialog({
 }) {
   const [formData, setFormData] = useState({
     uid: "",
-    email: "",
     password: "",
     name: "",
     gender: "",
@@ -35,23 +40,32 @@ export default function CreateUserDialog({
   const handleSubmit = async () => {
     try {
       const baseUrl = getApiBase();
+
+      const payload = {
+        ...formData,
+        age: formData.age ? Number(formData.age) : null,
+        weekNo: formData.weekNo ? Number(formData.weekNo) : undefined,
+        startDate: formData.startDate
+          ? new Date(formData.startDate).toISOString()
+          : undefined,
+      };
+
       const res = await fetch(`${baseUrl}/users/create-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          age: Number(formData.age),
-          weekNo: Number(formData.weekNo),
-          startDate: new Date(formData.startDate).toISOString(),
-        }),
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Failed to create user");
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err?.detail || "Failed to create user");
+      }
 
       onOpenChange(false);
-      window.location.reload(); // refresh to show new data
+      window.location.reload();
     } catch (err) {
       console.error("Error creating user:", err);
+      alert("Failed to create user. Check console for details.");
     }
   };
 
@@ -61,13 +75,13 @@ export default function CreateUserDialog({
     <div className="fixed inset-0 backdrop-blur-[3px] flex justify-center items-center z-50">
       <Card className="w-full max-w-2xl bg-white rounded-xl shadow-xl">
         <CardHeader>
-          <CardTitle className="text-[28px] font-bold text-gray-900 dark:text-white">
-          Create New User
+          <CardTitle className="text-[28px] font-bold text-gray-900">
+            Create New User
           </CardTitle>
         </CardHeader>
 
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Each field group has spacing between label and input */}
+          {/* User ID */}
           <div className="flex flex-col space-y-2">
             <Label>User ID</Label>
             <Input
@@ -77,6 +91,7 @@ export default function CreateUserDialog({
             />
           </div>
 
+          {/* Name */}
           <div className="flex flex-col space-y-2">
             <Label>Name</Label>
             <Input
@@ -86,21 +101,28 @@ export default function CreateUserDialog({
             />
           </div>
 
+          {/* Password */}
           <div className="flex flex-col space-y-2">
-            <Label>Email</Label>
+            <Label>Password</Label>
             <Input
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              placeholder="Enter email"
+              type="password"
+              value={formData.password}
+              onChange={(e) =>
+                handleChange("password", e.target.value)
+              }
+              placeholder="Set password"
             />
           </div>
 
+          {/* Gender */}
           <div className="flex flex-col space-y-2">
             <Label>Gender</Label>
             <select
               value={formData.gender}
-              onChange={(e) => handleChange("gender", e.target.value)}
-              className="border rounded-md px-3 py-2 w-full text-gray-600 focus:ring-2 text-sm focus:ring-gray-400 focus:outline-none"
+              onChange={(e) =>
+                handleChange("gender", e.target.value)
+              }
+              className="border rounded-md px-3 py-2 w-full text-gray-600 text-sm focus:ring-2 focus:ring-gray-400 focus:outline-none"
             >
               <option value="">Select gender</option>
               <option value="Male">Male</option>
@@ -109,52 +131,65 @@ export default function CreateUserDialog({
             </select>
           </div>
 
+          {/* Diagnosis */}
           <div className="flex flex-col space-y-2">
             <Label>Diagnosis</Label>
             <Input
               value={formData.diagnosis}
-              onChange={(e) => handleChange("diagnosis", e.target.value)}
+              onChange={(e) =>
+                handleChange("diagnosis", e.target.value)
+              }
               placeholder="Enter diagnosis"
             />
           </div>
 
+          {/* Age */}
           <div className="flex flex-col space-y-2">
             <Label>Age</Label>
             <Input
               type="number"
               value={formData.age}
-              onChange={(e) => handleChange("age", e.target.value)}
+              onChange={(e) =>
+                handleChange("age", e.target.value)
+              }
               placeholder="Enter age"
             />
           </div>
 
+          {/* Start Date */}
           <div className="flex flex-col space-y-2">
             <Label>Start Date</Label>
-            <div className="relative">
-              <Input
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => handleChange("startDate", e.target.value)}
-                className="w-full pr-10 text-gray-600 text-sm border rounded-md focus:ring-2 focus:ring-gray-400 focus:outline-none [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:top-1/2 [&::-webkit-calendar-picker-indicator]:-translate-y-1/2 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-              />
-            </div>
+            <Input
+              type="date"
+              value={formData.startDate}
+              onChange={(e) =>
+                handleChange("startDate", e.target.value)
+              }
+              className="text-sm"
+            />
           </div>
 
+          {/* Week No */}
           <div className="flex flex-col space-y-2">
             <Label>Week No</Label>
             <Input
               type="number"
               value={formData.weekNo}
-              onChange={(e) => handleChange("weekNo", e.target.value)}
+              onChange={(e) =>
+                handleChange("weekNo", e.target.value)
+              }
               placeholder="Enter week number"
             />
           </div>
 
+          {/* Status */}
           <div className="flex flex-col space-y-2">
             <Label>Status</Label>
             <select
               value={formData.status}
-              onChange={(e) => handleChange("status", e.target.value)}
+              onChange={(e) =>
+                handleChange("status", e.target.value)
+              }
               className="border rounded-md px-3 py-2 w-full text-sm text-gray-600 focus:ring-2 focus:ring-gray-400 focus:outline-none"
             >
               <option value="Active">Active</option>
@@ -164,10 +199,13 @@ export default function CreateUserDialog({
         </CardContent>
 
         <CardFooter className="flex justify-end gap-3">
-          <Button variant="outline" className="cursor-pointer" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
-          <Button className="cursor-pointer" onClick={handleSubmit}>Create</Button>
+          <Button onClick={handleSubmit}>Create</Button>
         </CardFooter>
       </Card>
     </div>
