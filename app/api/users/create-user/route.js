@@ -106,7 +106,6 @@ export async function POST(req) {
   try {
     const {
       uid,
-      password,
       name,
       gender,
       role,
@@ -127,7 +126,7 @@ export async function POST(req) {
 
     /* -------- Defaults -------- */
     const userRole = role?.trim() || "Patient";
-    const userPassword = password?.trim() || "Password123";
+    const userPassword = "Password123";
     const createdAt = new Date().toISOString();
 
     /* -------- Check Firestore -------- */
