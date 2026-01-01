@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
+import bcrypt from "bcryptjs";
 
 /* ---------------------------------------------------
    Firebase Admin Initialization (Singleton)
@@ -126,7 +127,6 @@ export async function POST(req) {
 
     /* -------- Defaults -------- */
     const userRole = role?.trim() || "Patient";
-    const userPassword = "Password123";
     const createdAt = new Date().toISOString();
 
     /* -------- Check Firestore -------- */
@@ -145,10 +145,10 @@ export async function POST(req) {
     /* -------- Create Firebase Auth User -------- */
     await auth.createUser({
       uid,
-      password: userPassword,
       displayName: name,
     });
 
+    const passwordHash = await bcrypt.hash("Password123", 10);
     /* -------- Firestore User Data -------- */
     const userData = {
       uid,
@@ -162,6 +162,7 @@ export async function POST(req) {
       weekNo: weekNo ?? 1,
       status: status || "Active",
       createdAt,
+      passwordHash, 
     };
 
     await db
