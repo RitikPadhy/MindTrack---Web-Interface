@@ -20,6 +20,8 @@ const CATEGORIES = [
   "Leisure",
   "Rest or Sleep",
   "Social participation",
+  "Spiritual or religious tasks",
+  "Other"
 ];
 
 type TaskItem = {

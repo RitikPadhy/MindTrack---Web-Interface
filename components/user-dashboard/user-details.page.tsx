@@ -32,6 +32,8 @@ export default function UserDetailsPage({
     { name: "Leisure", value: 15 },
     { name: "Rest or Sleep", value: 15 },
     { name: "Social Participation", value: 10 },
+    { name: "Spiritual or religious tasks", value: 17 },
+    { name: "Others", value: 13 },
   ];
 
   const COLORS = [
