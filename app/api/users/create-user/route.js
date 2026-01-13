@@ -46,7 +46,7 @@ function generateFourWeekRoutine(createdAt) {
       for (let i = 0; i < 60; i += 15) {
         const [h] = hour.split(":");
         const slot = `${h}:${String(i).padStart(2, "0")}`;
-        slots[slot] = { filled: false, task: null };
+        slots[slot] = { filled: false, taskIndex: null };
       }
 
       routineData[dateKey][hour] = { slots };
