@@ -134,15 +134,15 @@ export default function UserDetailsPage({
 
   return (
     <div className="fixed inset-0 backdrop-blur-[3px] flex justify-center items-center z-50">
-      <Card className="w-full max-w-5xl bg-white rounded-xl shadow-xl">
+      <Card className="w-full max-w-7xl bg-white rounded-xl shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         <CardHeader>
           <h2 className="text-2xl font-semibold text-gray-800 text-center">
             {user?.name || "Patient"} — Activity Overview
           </h2>
         </CardHeader>
 
-        <CardContent>
-          <div className="flex flex-col lg:flex-row gap-8">
+        <CardContent className="flex-1 overflow-y-auto p-6">
+          <div className="flex flex-col gap-8">
             {/* ---------------- Pie Chart ---------------- */}
             <Card className="flex-1 p-4 shadow-md border border-gray-200">
               <CardHeader>
@@ -198,7 +198,7 @@ export default function UserDetailsPage({
                   <table className="min-w-full text-sm text-center">
                     <thead className="bg-gray-100 text-gray-700 whitespace-nowrap">
                       <tr>
-                        <th className="px-3 py-3 border-b">Week</th>
+                        <th className="px-3 py-3 border-b sticky left-0 bg-gray-100 z-10">Week</th>
                         <th className="px-3 py-3 border-b">Days Used</th>
                         <th className="px-3 py-3 border-b">Check-ins</th>
                         <th className="px-3 py-3 border-b">Activities Tracked</th>
@@ -214,7 +214,7 @@ export default function UserDetailsPage({
                     <tbody>
                       {weekData.map((row, i) => (
                         <tr key={i} className="even:bg-gray-50 whitespace-nowrap">
-                          <td className="px-3 py-2 border-b font-medium">{row.week}</td>
+                          <td className="px-3 py-2 border-b font-medium sticky left-0 bg-inherit z-10">{row.week}</td>
                           <td className="px-3 py-2 border-b">{row.daysUsed}</td>
                           <td className="px-3 py-2 border-b">{row.checkIns}</td>
                           <td className="px-3 py-2 border-b">{row.activitiesTracked}</td>
