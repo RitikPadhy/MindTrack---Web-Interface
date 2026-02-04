@@ -78,10 +78,58 @@ export default function UserDetailsPage({
      ✅ Static weekly summary
   ------------------------------------------------------- */
   const weekData = [
-    { week: "Week 1", timeSpent: "12 hrs", daysActive: 5, tasksDone: 4 },
-    { week: "Week 2", timeSpent: "10 hrs", daysActive: 4, tasksDone: 3 },
-    { week: "Week 3", timeSpent: "15 hrs", daysActive: 6, tasksDone: 5 },
-    { week: "Week 4", timeSpent: "9 hrs", daysActive: 3, tasksDone: 3 },
+    {
+      week: "Week 1",
+      daysUsed: 5,
+      checkIns: 12,
+      activitiesTracked: 8,
+      selfCareTime: "2h 30m",
+      othersHomeTime: "1h 45m",
+      workEduTime: "6h 00m",
+      leisureTime: "2h 15m",
+      restSleepTime: "8h 00m",
+      socialTime: "1h 30m",
+      comments: "Consistent routine established."
+    },
+    {
+      week: "Week 2",
+      daysUsed: 4,
+      checkIns: 10,
+      activitiesTracked: 6,
+      selfCareTime: "2h 00m",
+      othersHomeTime: "2h 15m",
+      workEduTime: "5h 30m",
+      leisureTime: "1h 45m",
+      restSleepTime: "7h 30m",
+      socialTime: "2h 00m",
+      comments: "Slight decrease in engagement."
+    },
+    {
+      week: "Week 3",
+      daysUsed: 6,
+      checkIns: 15,
+      activitiesTracked: 10,
+      selfCareTime: "3h 00m",
+      othersHomeTime: "1h 30m",
+      workEduTime: "7h 00m",
+      leisureTime: "2h 30m",
+      restSleepTime: "8h 30m",
+      socialTime: "1h 45m",
+      comments: "Increased productivity and sleep quality."
+    },
+    {
+      week: "Week 4",
+      daysUsed: 3,
+      checkIns: 8,
+      activitiesTracked: 5,
+      selfCareTime: "1h 30m",
+      othersHomeTime: "2h 00m",
+      workEduTime: "4h 00m",
+      leisureTime: "1h 15m",
+      restSleepTime: "7h 00m",
+      socialTime: "1h 00m",
+      comments: "Busy week, focused on recovery."
+    },
   ];
 
   return (
@@ -148,23 +196,35 @@ export default function UserDetailsPage({
               <CardContent>
                 <div className="overflow-x-auto border border-gray-200 rounded-lg">
                   <table className="min-w-full text-sm text-center">
-                    <thead className="bg-gray-100 text-gray-700">
+                    <thead className="bg-gray-100 text-gray-700 whitespace-nowrap">
                       <tr>
                         <th className="px-3 py-3 border-b">Week</th>
-                        <th className="px-3 py-3 border-b">Time Spent</th>
-                        <th className="px-3 py-3 border-b">Days Active</th>
-                        <th className="px-3 py-3 border-b">
-                          Task Varieties
-                        </th>
+                        <th className="px-3 py-3 border-b">Days Used</th>
+                        <th className="px-3 py-3 border-b">Check-ins</th>
+                        <th className="px-3 py-3 border-b">Activities Tracked</th>
+                        <th className="px-3 py-3 border-b">Self Care</th>
+                        <th className="px-3 py-3 border-b">Home / Others</th>
+                        <th className="px-3 py-3 border-b">Work / Edu</th>
+                        <th className="px-3 py-3 border-b">Leisure</th>
+                        <th className="px-3 py-3 border-b">Rest & Sleep</th>
+                        <th className="px-3 py-3 border-b">Social</th>
+                        <th className="px-3 py-3 border-b">Comments</th>
                       </tr>
                     </thead>
                     <tbody>
                       {weekData.map((row, i) => (
-                        <tr key={i} className="even:bg-gray-50">
-                          <td className="px-3 py-2 border-b">{row.week}</td>
-                          <td className="px-3 py-2 border-b">{row.timeSpent}</td>
-                          <td className="px-3 py-2 border-b">{row.daysActive}</td>
-                          <td className="px-3 py-2 border-b">{row.tasksDone}</td>
+                        <tr key={i} className="even:bg-gray-50 whitespace-nowrap">
+                          <td className="px-3 py-2 border-b font-medium">{row.week}</td>
+                          <td className="px-3 py-2 border-b">{row.daysUsed}</td>
+                          <td className="px-3 py-2 border-b">{row.checkIns}</td>
+                          <td className="px-3 py-2 border-b">{row.activitiesTracked}</td>
+                          <td className="px-3 py-2 border-b">{row.selfCareTime}</td>
+                          <td className="px-3 py-2 border-b">{row.othersHomeTime}</td>
+                          <td className="px-3 py-2 border-b">{row.workEduTime}</td>
+                          <td className="px-3 py-2 border-b">{row.leisureTime}</td>
+                          <td className="px-3 py-2 border-b">{row.restSleepTime}</td>
+                          <td className="px-3 py-2 border-b">{row.socialTime}</td>
+                          <td className="px-3 py-2 border-b text-left max-w-xs truncate">{row.comments}</td>
                         </tr>
                       ))}
                     </tbody>
