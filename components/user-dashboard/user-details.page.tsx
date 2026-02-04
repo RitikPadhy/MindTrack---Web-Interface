@@ -134,7 +134,7 @@ export default function UserDetailsPage({
 
   return (
     <div className="fixed inset-0 backdrop-blur-[3px] flex justify-center items-center z-50">
-      <Card className="w-full max-w-7xl bg-white rounded-xl shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+      <Card className="w-[92vw] max-w-6xl h-[85vh] bg-white rounded-xl shadow-xl overflow-hidden flex flex-col">
         <CardHeader>
           <h2 className="text-2xl font-semibold text-gray-800 text-center">
             {user?.name || "Patient"} — Activity Overview
