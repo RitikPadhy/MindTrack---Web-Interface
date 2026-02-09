@@ -41,9 +41,7 @@ export default function UserDetailsPage({
   onOpenChange: (open: boolean) => void;
   user: any;
 }) {
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   const [loading, setLoading] = useState(false);
-  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const [metrics, setMetrics] = useState<{
     categoryData: CategoryMetric[];
@@ -54,7 +52,7 @@ export default function UserDetailsPage({
     const fetchDetails = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/users/${user.uid}/details`);
+        const res = await fetch(`/api/users/${user?.uid}/details`);
         if (res.ok) {
           const data = (await res.json()) as {
             categoryData: CategoryMetric[];
@@ -79,20 +77,7 @@ export default function UserDetailsPage({
   /* -------------------------------------------------------
      ✅ Data from API (or defaults)
   ------------------------------------------------------- */
-  const categoryData = metrics?.categoryData || [
-    { name: "Care of Self", value: 1 },
-    { name: "Care of Others / Home", value: 1 },
-    { name: "Work or Education", value: 1 },
-    { name: "Leisure", value: 1 },
-    { name: "Rest or Sleep", value: 1 },
-    { name: "Social Participation", value: 1 },
-  ];
-
-  // Show placeholder if loading or no data?
-  // If we have real data (even zeros), use it.
-  // API returns all categories. If all are 0, PieChart might look weird.
-  // Let's rely on API sending correct structure.
-
+  const categoryData = metrics?.categoryData || [];
   const weekData = metrics?.weekData || [];
 
   const COLORS = [
@@ -122,6 +107,8 @@ export default function UserDetailsPage({
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
+    if (percent === 0) return null;
+
     return (
       <text
         x={x}
@@ -147,97 +134,112 @@ export default function UserDetailsPage({
         </CardHeader>
 
         <CardContent className="flex-1 overflow-y-auto p-6">
-          <div className="flex flex-col gap-8">
-            {/* ---------------- Pie Chart ---------------- */}
-            <Card className="flex-1 p-4 shadow-md border border-gray-200">
-              <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-700 text-center">
-                  Activity Category Distribution
-                </h3>
-              </CardHeader>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-gray-500 font-medium">Fetching activity data...</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-8">
+              {/* ---------------- Pie Chart ---------------- */}
+              <Card className="flex-1 p-4 shadow-md border border-gray-200">
+                <CardHeader>
+                  <h3 className="text-lg font-semibold text-gray-700 text-center">
+                    Activity Category Distribution
+                  </h3>
+                </CardHeader>
 
-              <CardContent className="flex justify-center items-center h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={120}
-                      paddingAngle={3}
-                      dataKey="value"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                    >
-                      {categoryData.map((_, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
+                <CardContent className="flex justify-center items-center h-80">
+                  {categoryData.length > 0 && categoryData.some(d => d.value > 0) ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={120}
+                          paddingAngle={3}
+                          dataKey="value"
+                          labelLine={false}
+                          label={renderCustomizedLabel}
+                        >
+                          {categoryData.map((_, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+
+                        <Tooltip />
+                        <Legend
+                          verticalAlign="bottom"
+                          height={48}
+                          iconType="circle"
+                          wrapperStyle={{ fontSize: "13px" }}
                         />
-                      ))}
-                    </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-gray-400 italic">No activity data recorded yet.</div>
+                  )}
+                </CardContent>
+              </Card>
 
-                    <Tooltip />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={48}
-                      iconType="circle"
-                      wrapperStyle={{ fontSize: "13px" }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+              {/* ---------------- Weekly Table ---------------- */}
+              <Card className="flex-1 p-4 shadow-md border border-gray-200">
+                <CardHeader>
+                  <h3 className="text-lg font-semibold text-gray-700 text-center">
+                    Weekly Activity Summary
+                  </h3>
+                </CardHeader>
 
-            {/* ---------------- Weekly Table ---------------- */}
-            <Card className="flex-1 p-4 shadow-md border border-gray-200">
-              <CardHeader>
-                <h3 className="text-lg font-semibold text-gray-700 text-center">
-                  Weekly Activity Summary
-                </h3>
-              </CardHeader>
-
-              <CardContent>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                  <table className="min-w-full text-sm text-center">
-                    <thead className="bg-gray-100 text-gray-700 whitespace-nowrap">
-                      <tr>
-                        <th className="px-3 py-3 border-b sticky left-0 bg-gray-100 z-10">Week</th>
-                        <th className="px-3 py-3 border-b">Days Used</th>
-                        <th className="px-3 py-3 border-b">Check-ins</th>
-                        <th className="px-3 py-3 border-b">Activities Tracked</th>
-                        <th className="px-3 py-3 border-b">Self Care</th>
-                        <th className="px-3 py-3 border-b">Home / Others</th>
-                        <th className="px-3 py-3 border-b">Work / Edu</th>
-                        <th className="px-3 py-3 border-b">Leisure</th>
-                        <th className="px-3 py-3 border-b">Rest & Sleep</th>
-                        <th className="px-3 py-3 border-b">Social</th>
-                        <th className="px-3 py-3 border-b">Comments</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {weekData.map((row, i) => (
-                        <tr key={i} className="even:bg-gray-50 whitespace-nowrap">
-                          <td className="px-3 py-2 border-b font-medium sticky left-0 bg-inherit z-10">{row.week}</td>
-                          <td className="px-3 py-2 border-b">{row.daysUsed}</td>
-                          <td className="px-3 py-2 border-b">{row.checkIns}</td>
-                          <td className="px-3 py-2 border-b">{row.activitiesTracked}</td>
-                          <td className="px-3 py-2 border-b">{row.selfCareTime}</td>
-                          <td className="px-3 py-2 border-b">{row.othersHomeTime}</td>
-                          <td className="px-3 py-2 border-b">{row.workEduTime}</td>
-                          <td className="px-3 py-2 border-b">{row.leisureTime}</td>
-                          <td className="px-3 py-2 border-b">{row.restSleepTime}</td>
-                          <td className="px-3 py-2 border-b">{row.socialTime}</td>
-                          <td className="px-3 py-2 border-b text-left max-w-xs truncate">{row.comments}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                <CardContent>
+                  {weekData.length > 0 ? (
+                    <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                      <table className="min-w-full text-sm text-center">
+                        <thead className="bg-gray-100 text-gray-700 whitespace-nowrap">
+                          <tr>
+                            <th className="px-3 py-3 border-b sticky left-0 bg-gray-100 z-10">Week</th>
+                            <th className="px-3 py-3 border-b">Days Used</th>
+                            <th className="px-3 py-3 border-b">Check-ins</th>
+                            <th className="px-3 py-3 border-b">Activities Tracked</th>
+                            <th className="px-3 py-3 border-b">Self Care</th>
+                            <th className="px-3 py-3 border-b">Home / Others</th>
+                            <th className="px-3 py-3 border-b">Work / Edu</th>
+                            <th className="px-3 py-3 border-b">Leisure</th>
+                            <th className="px-3 py-3 border-b">Rest & Sleep</th>
+                            <th className="px-3 py-3 border-b">Social</th>
+                            <th className="px-3 py-3 border-b">Comments</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {weekData.map((row, i) => (
+                            <tr key={i} className="even:bg-gray-50 whitespace-nowrap">
+                              <td className="px-3 py-2 border-b font-medium sticky left-0 bg-inherit z-10">{row.week}</td>
+                              <td className="px-3 py-2 border-b">{row.daysUsed}</td>
+                              <td className="px-3 py-2 border-b">{row.checkIns}</td>
+                              <td className="px-3 py-2 border-b">{row.activitiesTracked}</td>
+                              <td className="px-3 py-2 border-b">{row.selfCareTime}</td>
+                              <td className="px-3 py-2 border-b">{row.othersHomeTime}</td>
+                              <td className="px-3 py-2 border-b">{row.workEduTime}</td>
+                              <td className="px-3 py-2 border-b">{row.leisureTime}</td>
+                              <td className="px-3 py-2 border-b">{row.restSleepTime}</td>
+                              <td className="px-3 py-2 border-b">{row.socialTime}</td>
+                              <td className="px-3 py-2 border-b text-left max-w-xs truncate">{row.comments}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-400 italic">No weekly summary available.</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="flex justify-center">
