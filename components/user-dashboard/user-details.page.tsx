@@ -102,6 +102,7 @@ export default function UserDetailsPage({
     "#fb7185", // pink
     "#a78bfa", // purple
     "#38bdf8", // sky
+    "#94a3b8", // slate for "Other"
   ];
 
   /* -------------------------------------------------------
