@@ -147,73 +147,81 @@ export default function UpdateUserDialog({
             const startHour = 6 + slotIdx;
             const endHour = startHour + 1;
 
+            const formatHour = (h: number) => {
+              const period = h >= 12 ? "PM" : "AM";
+              let displayHour = h % 12;
+              if (displayHour === 0) displayHour = 12;
+              return `${displayHour}${period}`;
+            };
+
             return (
-            <div
-              key={slotIdx}
-              className="border rounded-lg p-3 space-y-2"
-            >
-              <Label>
-                Time Slot {slotIdx + 1} ({startHour}:00 - {endHour}:00)
-              </Label>
+              <div
+                key={slotIdx}
+                className="border rounded-lg p-3 space-y-2"
+              >
+                <Label className="text-blue-600 font-semibold">
+                  Slot {slotIdx + 1}: {formatHour(startHour)} — {formatHour(endHour)}
+                </Label>
 
-              {slot.map((task, taskIdx) => (
-                <div key={taskIdx} className="flex gap-2 items-center">
-                  <select
-                    value={task.category}
-                    onChange={(e) =>
-                      updateTask(
-                        slotIdx,
-                        taskIdx,
-                        "category",
-                        e.target.value
-                      )
-                    }
-                    className="border rounded px-2 py-1 w-1/3"
-                  >
-                    <option value="">Choose category</option>
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-
-                  <Input
-                    value={task.title}
-                    onChange={(e) =>
-                      updateTask(
-                        slotIdx,
-                        taskIdx,
-                        "title",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Enter task"
-                  />
-
-                  {/* + Button */}
-                  {taskIdx === 0 && slot.length === 1 && (
-                    <Button
-                      variant="outline"
-                      onClick={() => addTaskRow(slotIdx)}
+                {slot.map((task, taskIdx) => (
+                  <div key={taskIdx} className="flex gap-2 items-center">
+                    <select
+                      value={task.category}
+                      onChange={(e) =>
+                        updateTask(
+                          slotIdx,
+                          taskIdx,
+                          "category",
+                          e.target.value
+                        )
+                      }
+                      className="border rounded px-2 py-1 w-1/3"
                     >
-                      +
-                    </Button>
-                  )}
+                      <option value="">Choose category</option>
+                      {CATEGORIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
 
-                  {/* − Button */}
-                  {taskIdx === 1 && (
-                    <Button
-                      variant="outline"
-                      onClick={() => removeTaskRow(slotIdx)}
-                    >
-                      −
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          )})}
+                    <Input
+                      value={task.title}
+                      onChange={(e) =>
+                        updateTask(
+                          slotIdx,
+                          taskIdx,
+                          "title",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Enter task"
+                    />
+
+                    {/* + Button */}
+                    {taskIdx === 0 && slot.length === 1 && (
+                      <Button
+                        variant="outline"
+                        onClick={() => addTaskRow(slotIdx)}
+                      >
+                        +
+                      </Button>
+                    )}
+
+                    {/* − Button */}
+                    {taskIdx === 1 && (
+                      <Button
+                        variant="outline"
+                        onClick={() => removeTaskRow(slotIdx)}
+                      >
+                        −
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )
+          })}
         </CardContent>
 
         <CardFooter className="flex justify-end gap-2">
