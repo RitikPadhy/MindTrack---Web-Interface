@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +13,25 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+export interface CategoryMetric {
+  name: string;
+  value: number;
+}
+
+export interface WeekMetric {
+  week: string;
+  daysUsed: number;
+  checkIns: number;
+  activitiesTracked: number;
+  selfCareTime: string;
+  othersHomeTime: string;
+  workEduTime: string;
+  leisureTime: string;
+  restSleepTime: string;
+  socialTime: string;
+  comments: string;
+}
+
 export default function UserDetailsPage({
   open,
   onOpenChange,
@@ -20,19 +41,59 @@ export default function UserDetailsPage({
   onOpenChange: (open: boolean) => void;
   user: any;
 }) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const [loading, setLoading] = useState(false);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  const [metrics, setMetrics] = useState<{
+    categoryData: CategoryMetric[];
+    weekData: WeekMetric[];
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/users/${user.uid}/details`);
+        if (res.ok) {
+          const data = (await res.json()) as {
+            categoryData: CategoryMetric[];
+            weekData: WeekMetric[];
+          };
+          setMetrics(data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (open && user?.uid) {
+      fetchDetails();
+    }
+  }, [open, user]);
+
   if (!open) return null;
 
   /* -------------------------------------------------------
-     ✅ STATIC CATEGORY DISTRIBUTION (ALL 6)
+     ✅ Data from API (or defaults)
   ------------------------------------------------------- */
-  const categoryData = [
-    { name: "Care of Self", value: 20 },
-    { name: "Care of Others / Home", value: 18 },
-    { name: "Work or Education", value: 22 },
-    { name: "Leisure", value: 15 },
-    { name: "Rest or Sleep", value: 15 },
-    { name: "Social Participation", value: 10 },
+  const categoryData = metrics?.categoryData || [
+    { name: "Care of Self", value: 1 },
+    { name: "Care of Others / Home", value: 1 },
+    { name: "Work or Education", value: 1 },
+    { name: "Leisure", value: 1 },
+    { name: "Rest or Sleep", value: 1 },
+    { name: "Social Participation", value: 1 },
   ];
+
+  // Show placeholder if loading or no data?
+  // If we have real data (even zeros), use it.
+  // API returns all categories. If all are 0, PieChart might look weird.
+  // Let's rely on API sending correct structure.
+
+  const weekData = metrics?.weekData || [];
 
   const COLORS = [
     "#4ade80", // green
@@ -53,6 +114,7 @@ export default function UserDetailsPage({
     innerRadius,
     outerRadius,
     percent,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }: any) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -73,64 +135,6 @@ export default function UserDetailsPage({
       </text>
     );
   };
-
-  /* -------------------------------------------------------
-     ✅ Static weekly summary
-  ------------------------------------------------------- */
-  const weekData = [
-    {
-      week: "Week 1",
-      daysUsed: 5,
-      checkIns: 12,
-      activitiesTracked: 8,
-      selfCareTime: "2h 30m",
-      othersHomeTime: "1h 45m",
-      workEduTime: "6h 00m",
-      leisureTime: "2h 15m",
-      restSleepTime: "8h 00m",
-      socialTime: "1h 30m",
-      comments: "Consistent routine established."
-    },
-    {
-      week: "Week 2",
-      daysUsed: 4,
-      checkIns: 10,
-      activitiesTracked: 6,
-      selfCareTime: "2h 00m",
-      othersHomeTime: "2h 15m",
-      workEduTime: "5h 30m",
-      leisureTime: "1h 45m",
-      restSleepTime: "7h 30m",
-      socialTime: "2h 00m",
-      comments: "Slight decrease in engagement."
-    },
-    {
-      week: "Week 3",
-      daysUsed: 6,
-      checkIns: 15,
-      activitiesTracked: 10,
-      selfCareTime: "3h 00m",
-      othersHomeTime: "1h 30m",
-      workEduTime: "7h 00m",
-      leisureTime: "2h 30m",
-      restSleepTime: "8h 30m",
-      socialTime: "1h 45m",
-      comments: "Increased productivity and sleep quality."
-    },
-    {
-      week: "Week 4",
-      daysUsed: 3,
-      checkIns: 8,
-      activitiesTracked: 5,
-      selfCareTime: "1h 30m",
-      othersHomeTime: "2h 00m",
-      workEduTime: "4h 00m",
-      leisureTime: "1h 15m",
-      restSleepTime: "7h 00m",
-      socialTime: "1h 00m",
-      comments: "Busy week, focused on recovery."
-    },
-  ];
 
   return (
     <div className="fixed inset-0 backdrop-blur-[3px] flex justify-center items-center z-50">
