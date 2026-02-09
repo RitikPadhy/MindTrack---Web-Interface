@@ -20,6 +20,8 @@ const CATEGORIES = [
   "Leisure",
   "Rest or Sleep",
   "Social participation",
+  "Spiritual or religious tasks",
+  "Other"
 ];
 
 type TaskItem = {
@@ -141,12 +143,18 @@ export default function UpdateUserDialog({
           </div>
 
           {/* Task Slots */}
-          {tasks.map((slot, slotIdx) => (
+          {tasks.map((slot, slotIdx) => {
+            const startHour = 6 + slotIdx;
+            const endHour = startHour + 1;
+
+            return (
             <div
               key={slotIdx}
               className="border rounded-lg p-3 space-y-2"
             >
-              <Label>Task Slot {slotIdx + 1}</Label>
+              <Label>
+                Time Slot {slotIdx + 1} ({startHour}:00 - {endHour}:00)
+              </Label>
 
               {slot.map((task, taskIdx) => (
                 <div key={taskIdx} className="flex gap-2 items-center">
@@ -205,7 +213,7 @@ export default function UpdateUserDialog({
                 </div>
               ))}
             </div>
-          ))}
+          )})}
         </CardContent>
 
         <CardFooter className="flex justify-end gap-2">

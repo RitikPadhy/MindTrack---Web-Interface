@@ -9,28 +9,15 @@ import bcrypt from "bcryptjs";
 --------------------------------------------------- */
 if (!getApps().length) {
   try {
-    const base64String =
-      process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+    const base64String = process.env.FIREBASE_ADMIN_CREDENTIAL_BASE64;
+    if (!base64String) throw new Error("Missing FIREBASE_ADMIN_CREDENTIAL_BASE64");
 
-    if (!base64String) {
-      throw new Error("Missing FIREBASE_ADMIN_CREDENTIAL_BASE64");
-    }
-
-    const serviceAccountJson = Buffer.from(
-      base64String,
-      "base64"
-    ).toString("utf8");
-
+    const serviceAccountJson = Buffer.from(base64String, "base64").toString("utf8");
     const serviceAccount = JSON.parse(serviceAccountJson);
 
-    initializeApp({
-      credential: cert(serviceAccount),
-    });
+    initializeApp({ credential: cert(serviceAccount) });
   } catch (error) {
-    console.error(
-      "❌ Failed to initialize Firebase Admin SDK:",
-      error
-    );
+    console.error("❌ Failed to initialize Firebase Admin SDK:", error);
   }
 }
 
@@ -44,11 +31,7 @@ function generateFourWeekRoutine(createdAt) {
   const routineData = {};
   const startDate = new Date(createdAt);
 
-  // 06:00 → 22:00 (17 hours)
-  const hoursList = Array.from(
-    { length: 17 },
-    (_, i) => `${String(6 + i).padStart(2, "0")}:00`
-  );
+  const hoursList = Array.from({ length: 17 }, (_, i) => `${String(6 + i).padStart(2, "0")}:00`);
 
   for (let dayOffset = 0; dayOffset < 28; dayOffset++) {
     const currentDate = new Date(startDate);
@@ -63,7 +46,7 @@ function generateFourWeekRoutine(createdAt) {
       for (let i = 0; i < 60; i += 15) {
         const [h] = hour.split(":");
         const slot = `${h}:${String(i).padStart(2, "0")}`;
-        slots[slot] = { filled: false };
+        slots[slot] = { filled: false, taskIndex: null };
       }
 
       routineData[dateKey][hour] = { slots };
@@ -74,29 +57,33 @@ function generateFourWeekRoutine(createdAt) {
 }
 
 /* ---------------------------------------------------
+   Helper: Assign task to first available slot
+--------------------------------------------------- */
+function assignTaskToHourSlots(hourSlots, task) {
+  for (const slot in hourSlots) {
+    if (!hourSlots[slot].filled) {
+      hourSlots[slot].filled = true;
+      hourSlots[slot].task = task;
+      return slot;
+    }
+  }
+  throw new Error("No free slots available in this hour");
+}
+
+/* ---------------------------------------------------
    Helper: Create Patient Routine
 --------------------------------------------------- */
 async function createPatientRoutine(uid, role, createdAt) {
   const routineData = generateFourWeekRoutine(createdAt);
-
-  const tasksArray = Array.from(
-    { length: 17 },
-    () => ({ tasks: [] })
-  );
 
   const routineDoc = {
     uid,
     role,
     createdAt,
     routines: routineData,
-    tasks: tasksArray,
   };
 
-  await db
-    .collection("daily_routines")
-    .doc(uid)
-    .set(routineDoc);
-
+  await db.collection("daily_routines").doc(uid).set(routineDoc);
   console.log(`✅ Routine created for patient ${uid}`);
 }
 
@@ -105,51 +92,25 @@ async function createPatientRoutine(uid, role, createdAt) {
 --------------------------------------------------- */
 export async function POST(req) {
   try {
-    const {
-      uid,
-      name,
-      gender,
-      role,
-      diagnosis,
-      age,
-      startDate,
-      weekNo,
-      status,
-    } = await req.json();
+    const { uid, name, gender, role, diagnosis, age, startDate, weekNo, status } = await req.json();
 
-    /* -------- Validation -------- */
     if (!uid || !name) {
-      return NextResponse.json(
-        { detail: "Missing required fields: uid, name" },
-        { status: 400 }
-      );
+      return NextResponse.json({ detail: "Missing required fields: uid, name" }, { status: 400 });
     }
 
-    /* -------- Defaults -------- */
     const userRole = role?.trim() || "Patient";
     const createdAt = new Date().toISOString();
 
-    /* -------- Check Firestore -------- */
-    const existing = await db
-      .collection("users")
-      .doc(uid)
-      .get();
-
+    const existing = await db.collection("users").doc(uid).get();
     if (existing.exists) {
-      return NextResponse.json(
-        { detail: `User with UID ${uid} already exists` },
-        { status: 400 }
-      );
+      return NextResponse.json({ detail: `User with UID ${uid} already exists` }, { status: 400 });
     }
 
-    /* -------- Create Firebase Auth User -------- */
-    await auth.createUser({
-      uid,
-      displayName: name,
-    });
+    // Create Firebase Auth user
+    await auth.createUser({ uid, displayName: name });
 
     const passwordHash = await bcrypt.hash("Password123", 10);
-    /* -------- Firestore User Data -------- */
+
     const userData = {
       uid,
       name,
@@ -162,39 +123,19 @@ export async function POST(req) {
       weekNo: weekNo ?? 1,
       status: status || "Active",
       createdAt,
-      passwordHash, 
+      passwordHash,
     };
 
-    await db
-      .collection("users")
-      .doc(uid)
-      .set(userData);
+    await db.collection("users").doc(uid).set(userData);
 
-    /* -------- Auto Create Routine -------- */
+    // Auto-create routine for patients
     if (userRole.toLowerCase() === "patient") {
-      await createPatientRoutine(
-        uid,
-        userRole,
-        createdAt
-      );
+      await createPatientRoutine(uid, userRole, createdAt);
     }
 
-    return NextResponse.json(
-      {
-        message: "User created successfully",
-        user: userData,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: "User created successfully", user: userData }, { status: 201 });
   } catch (error) {
     console.error("❌ Error creating user:", error);
-
-    return NextResponse.json(
-      {
-        detail:
-          error.message || "Internal server error",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ detail: error.message || "Internal server error" }, { status: 500 });
   }
 }
