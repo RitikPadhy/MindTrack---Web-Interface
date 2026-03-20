@@ -38,7 +38,7 @@ export async function GET() {
       const uid = userData.uid || userDoc.id;
 
       // Fetch the user's daily routines document
-      const routineDoc = await db.collection("daily_routines").document(uid).get();
+      const routineDoc = await db.collection("daily_routines").doc(uid).get();
 
       const categoriesSet = new Set();
 
